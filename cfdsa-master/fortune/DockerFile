@@ -1,0 +1,23 @@
+FROM node:latest
+
+ENV APP_PORT=5000 APP_DIR=/fortune
+
+# create APP_DIR + CD in
+WORKDIR ${APP_DIR}
+
+# Copy files to APP_DIR
+ADD main.js .
+ADD package.json .
+ADD public public
+ADD views views
+
+# Install libraries from package.json
+RUN npm install
+
+# Defines how image is executed
+EXPOSE ${APP_PORT}
+
+HEALTHCHECK --interval=60s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f -s http://localhost:${APP_PORT}/health || exit 1
+
+ENTRYPOINT [ "node", "main.js" ]
